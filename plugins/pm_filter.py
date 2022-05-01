@@ -895,5 +895,3 @@ Try reading the instructions below 👇</b>""",
             await message.reply_sticker(sticker="CAACAgUAAxkBAAIGzGJi4LmteW8DPnYEHWLqC6AB7RhuAAKnAAPIlGQUYKZ2tWflHJ0eBA", reply_markup=InlineKeyboardMarkup(btn))
         else:
             await message.reply_sticker(sticker="CAACAgUAAxkBAAIGzGJi4LmteW8DPnYEHWLqC6AB7RhuAAKnAAPIlGQUYKZ2tWflHJ0eBA", reply_markup=InlineKeyboardMarkup(btn))
-
-        
