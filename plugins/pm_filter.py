@@ -213,7 +213,7 @@ async def next_page(bot, query):
         btn = [
             [
                 InlineKeyboardButton(
-                    text=f"[{get_size(file.file_size)}] {file.file_name}", callback_data=f'files#{file.file_id}'
+                    text=f"🔖 {get_size(file.file_size)} ➧ {file.file_name}", callback_data=f'files#{file.file_id}'
                 ),
             ]
             for file in files
@@ -796,21 +796,16 @@ async def cb_handler(client: Client, query: CallbackQuery):
 async def auto_filter(client, message):
     if re.findall("((^\/|^,|^!|^\.|^[\U0001F600-\U000E007F]).*)", message.text):
         return
-    if 2 < len(message.text) < 100:
-        
+    if 2 < len(message.text) < 100:    
+        btn = []
         search = message.text
-        files, offset, total_results = await get_search_results(search.lower(), offset=0, filter=True)
-        if not files:
-            return
-        if SINGLE_BUTTON:
-            btn = [
-                [
-                    InlineKeyboardButton(
-                        text=f"[{get_size(file.file_size)}] {file.file_name}", callback_data=f'files#{file.file_id}'
-                    ),
-                ]
-                for file in files
-            ]
+        files, offset, total_results = await get_search_results(search.lower(), offset=0)
+        if files:
+            for file in files:
+                file_id = file.file_id
+                btn.append(
+                    [InlineKeyboardButton(text=f"🔖 {get_size(file.file_size)} ➧ {file.file_name}", callback_data=f'files#{file_id}')]
+                    )
         else:
             m = await message.reply(
               text=f"""
