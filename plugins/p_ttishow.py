@@ -1,5 +1,15 @@
+import datetime
+now = datetime.datetime.now()
+hour = now.hour
+
+if hour < 12:
+    greeting = "Good morning"
+elif hour < 18:
+    greeting = "Good afternoon"
+else:
+    greeting = "Good night"
 from pyrogram import Client, filters
-from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup
+from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, CallbackQuery
 from pyrogram.errors.exceptions.bad_request_400 import MessageTooLong, PeerIdInvalid
 from info import ADMINS, LOG_CHANNEL, SUPPORT_CHAT
 from database.users_chats_db import db
@@ -9,6 +19,7 @@ from Script import script
 from pyrogram.errors import ChatAdminRequired
 
 """-----------------------------------------https://t.me/GetTGLink/4179 --------------------------------------"""
+
 
 @Client.on_message(filters.new_chat_members & filters.group)
 async def save_group(bot, message):
@@ -37,12 +48,11 @@ async def save_group(bot, message):
             await bot.leave_chat(message.chat.id)
             return
         buttons = [[
-            InlineKeyboardButton('ℹ️ Help', url=f"https://t.me/{temp.U_NAME}?start=help"),
-            InlineKeyboardButton('📢 Updates', url='https://t.me/TeamEvamaria')
+            InlineKeyboardButton('✘ Close ✘', callback_data='close_data')
         ]]
         reply_markup=InlineKeyboardMarkup(buttons)
         await message.reply_text(
-            text=f"<b>Thankyou For Adding Me In {message.chat.title} ❣️\n\nIf you have any questions & doubts about using me contact support.</b>",
+            text=f"<b>Thanks for adding me in {message.chat.title} ✨</b>",
             reply_markup=reply_markup)
     else:
         for u in message.new_chat_members:
@@ -51,7 +61,14 @@ async def save_group(bot, message):
                     await (temp.MELCOW['welcome']).delete()
                 except:
                     pass
-            temp.MELCOW['welcome'] = await message.reply(f"<b>Hey , {u.mention}, Welcome to {message.chat.title}</b>")
+            temp.MELCOW['welcome'] = await message.reply(f"""<b>✨ {greeting} {u.mention}! Welcome to {message.chat.title}</b>
+
+<b>🔘 No Promo, No Porn, No Other Abuses</b>
+<b>🔘 Ask Your Movies With Correct Spelling</b>
+<b>🔘 Spammers Stay Away</b>
+<b>🔘 Feel Free To Report Any Errors To Admins using @admin</b>
+
+<b>🔰 Share & Support Us 🔰</b>""")
 
 
 @Client.on_message(filters.command('leave') & filters.user(ADMINS))
