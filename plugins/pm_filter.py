@@ -20,6 +20,19 @@ from database.filters_mdb import(
    get_filters,
 )
 
+import datetime
+now = datetime.datetime.now()
+hour = now.hour
+
+if hour < 12:
+    greeting = "Good morning"
+elif hour < 18:
+    greeting = "Good afternoon"
+else:
+    greeting = "Good night"
+
+FILE_CHANNEL_ID = int(-1001731956857)
+
 BUTTONS = {}
 
 
@@ -330,15 +343,23 @@ async def cb_handler(client: Client, query: CallbackQuery):
         files = files_[0]
         title = files.file_name
         size=get_size(files.file_size)
+        mention = query.from_user.mention
         f_caption=files.caption
         if CUSTOM_FILE_CAPTION:
             try:
                 f_caption=CUSTOM_FILE_CAPTION.format(file_name=title, file_size=size, file_caption=f_caption)
+                buttons = [[
+                  InlineKeyboardButton('➕ADD ME TO YOUR GROUP➕', url=f'http://t.me/{temp.U_NAME}?startgroup=true')
+                  ]]  
             except Exception as e:
                 print(e)
             f_caption=f_caption
+            size = size
+            mention = mention
         if f_caption is None:
             f_caption = f"{files.file_name}"
+            size = f"{files.file_size}"
+            mention = f"{query.from_user.mention}"
             
         try:
             if AUTH_CHANNEL and not await is_subscribed(client, query):
@@ -348,12 +369,26 @@ async def cb_handler(client: Client, query: CallbackQuery):
                 await query.answer(url=f"https://t.me/{temp.U_NAME}?start={file_id}")
                 return
             else:
-                await client.send_cached_media(
-                    chat_id=query.from_user.id,
+                send_file = await client.send_cached_media(
+                    chat_id=FILE_CHANNEL_ID,
                     file_id=file_id,
-                    caption=f_caption
+                    caption=f'<b>{title}</b>\n\n<code>{size}</code>\n\n<code>=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=</code>\n\n<b>{greeting} {query.from_user.mention}✨</b>\n\n<i>Because of copyright this file will be deleted from here within 5 minutesSo forward it to anywhere before downloading!</i>\n\n<i>കോപ്പിറൈറ്റ് ഉള്ളതുകൊണ്ട് ഈ ഫയൽ 5 മിനിറ്റിനുള്ളിൽ ഇവിടെനിന്നും ഡിലീറ്റ് ആകുന്നതാണ്അതുകൊണ്ട് ഇവിടെ നിന്നും മറ്റെവിടെക്കെങ്കിലും മാറ്റിയതിന് ശേഷം ഡൗൺലോഡ് ചെയ്യുക!</i>\n\n<b><b>🔰 Powered By:</b>{query.message.chat.title}</b>',
+                    reply_markup = InlineKeyboardMarkup(buttons)   
                     )
-                await query.answer('Check PM, I have sent files in pm',show_alert = True)
+                btn = [[
+                    InlineKeyboardButton("🔥 GET FILE 🔥", url=f'{send_file.link}')
+                    ],[
+                    InlineKeyboardButton("✘ Close ✘", callback_data='close_data')
+                ]]
+                reply_markup = InlineKeyboardMarkup(btn)
+                bb = await query.message.reply_text(
+                    text=script.ANYFILECAPTION_TXT.format(file_name=title, file_size=size, file_caption=f_caption),
+                reply_markup = reply_markup
+                )
+                await asyncio.sleep(300)
+                await send_file.delete()
+                await bb.delete()
+
         except UserIsBlocked:
             await query.answer('Unblock the bot mahn !',show_alert = True)
         except PeerIdInvalid:
@@ -376,6 +411,9 @@ async def cb_handler(client: Client, query: CallbackQuery):
         if CUSTOM_FILE_CAPTION:
             try:
                 f_caption=CUSTOM_FILE_CAPTION.format(file_name=title, file_size=size, file_caption=f_caption)
+                buttons = [[
+                  InlineKeyboardButton('➕ADD ME TO YOUR GROUP➕', url=f'http://t.me/{temp.U_NAME}?startgroup=true')
+                  ]]
             except Exception as e:
                 print(e)
                 f_caption=f_caption
@@ -499,6 +537,29 @@ async def cb_handler(client: Client, query: CallbackQuery):
             reply_markup=reply_markup,
             parse_mode='html'
         )
+    elif query.data == "fil":
+        await query.answer("This movie have total : {total_results} ", show_alert=True
+        )
+    elif query.data == "ins":
+        await query.answer("👇 Select your language below 👇", show_alert=True
+        )
+    elif query.data == "tip":
+        await query.answer("""=> Ask with Correct Spelling
+=> Don't ask movie's those are not released in OTT 🤧
+=> For better results :
+      - Movie name language
+      - Eg: Solo Malayalam""", show_alert=True
+        )
+    elif query.data == "so":
+        await query.answer(f"""🏷 Title: {query} 
+🎭 Genres: {genres} 
+📆 Year: {year} 
+🌟 Rating: {rating} 
+☀️ Languages : {languages} 
+📀 RunTime: {runtime} Minutes
+📆 Release Info : {release_date} 
+""",show_alert=True
+       )
     elif query.data == "admin":
         buttons = [[
             InlineKeyboardButton('👩‍🦯 Back', callback_data='extra')
@@ -586,12 +647,22 @@ async def auto_filter(client, message):
             BUTTONS[key] = search
             req = message.from_user.id if message.from_user else 0
             btn.append(
-                [InlineKeyboardButton(text=f"🗓 1/{round(int(total_results)/10)}",callback_data="pages"), InlineKeyboardButton(text="NEXT ⏩",callback_data=f"next_{req}_{key}_{offset}")]
+                [InlineKeyboardButton(text="NEXT ⏩",callback_data=f"next_{req}_{key}_{offset}")]
+            )
+            btn.append(
+                [InlineKeyboardButton(text=f"🔰 Pages 1/{round(int(total_results)/10)}🔰",callback_data="pages")]
             )
         else:
             btn.append(
-                [InlineKeyboardButton(text="🗓 1/1",callback_data="pages")]
+                [InlineKeyboardButton(text="🔰 Pages 1/1🔰",callback_data="pages")]
             )
+        btn.insert(0, [
+            InlineKeyboardButton(text=f"📂 File: {len(files)}", callback_data="fil"),
+            InlineKeyboardButton("🔆 Tips", callback_data="tip")
+        ])
+        btn.insert(0, [
+            InlineKeyboardButton(text=f"🔮 {search} 🔮", callback_data="so")
+        ])
         imdb = await get_poster(search) if IMDB else None
         if imdb and imdb.get('poster'):
             try:
