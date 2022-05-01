@@ -36,6 +36,111 @@ FILE_CHANNEL_ID = int(-1001731956857)
 BUTTONS = {}
 
 
+@Client.on_message(filters.command('hin'))
+async def hin(client, message):
+    msg = await message.reply_text("""
+मुझे आपके द्वारा अनुरोधित फ़ाइल नहीं मिली 😕
+निम्नलिखित करने का प्रयास करें...
+
+=> सही वर्तनी के साथ अनुरोध
+
+=> उन फिल्मों के बारे में न पूछें जो ओटीटी प्लेटफॉर्म पर रिलीज नहीं हुई हैं
+
+=> इस प्रारूप में [मूवीनाम, भाषा] में पूछने का प्रयास करें।
+
+=> Google पर खोजने के लिए नीचे दिए गए बटन का प्रयोग करें 😌
+""", parse_mode="md",
+     reply_markup = InlineKeyboardMarkup(
+      [[
+        InlineKeyboardButton('🔍 Search On Google', url="https://google.com/search?q={search}")
+      ],
+      [
+        InlineKeyboardButton('✘ Close ✘', callback_data='close_data')
+     ]]))
+
+    await asyncio.sleep(50)
+    await msg.delete()
+
+
+
+@Client.on_message(filters.command('english'))
+async def english(client, message):
+    msg = await message.reply_text("""
+I couldn't find the file you requested 😕
+Try to do the following...
+
+=> Request with correct spelling
+
+=> Don't ask movies that are not released in OTT platforms
+
+=> Try to ask in [MovieName, Language] this format.
+
+=> Use the button below to search on Google 😌
+""", parse_mode="md",
+     reply_markup = InlineKeyboardMarkup(
+      [[
+        InlineKeyboardButton('🔍 Search On Google', url="https://google.com/search?q={search}")
+      ],
+      [
+        InlineKeyboardButton('✘ Close ✘', callback_data='close_data')
+     ]]))
+
+    await asyncio.sleep(50)
+    await msg.delete()
+
+
+@Client.on_message(filters.command('mal'))
+async def mal(client, message):
+    msg = await message.reply_text("""
+താങ്കൾ ആവശ്യപ്പെട്ട ഫയൽ എനിക്ക് കണ്ടെത്താനായില്ല 😕
+താഴെ പറയുന്ന കാര്യങ്ങളിൽ ശ്രദ്ധിക്കുക...
+
+=> കറക്റ്റ് സ്പെല്ലിംഗിൽ ചോദിക്കുക.
+
+=> ഒ.ടി.ടി പ്ലാറ്റ്ഫോമുകളിൽ റിലീസ് ആകാത്ത സിനിമകൾ ചോദിക്കരുത്.
+
+=> കഴിവതും [സിനിമയുടെ പേര്, ഭാഷ] ഈ രീതിയിൽ ചോദിക്കുക.
+
+=> ഗൂഗിളിൽ സെർച്ച് ചെയ്യാനായി താഴെ കാണുന്ന ബട്ടൺ ഉപയോഗിക്കാം 😌
+""", parse_mode="md",
+     reply_markup = InlineKeyboardMarkup(
+      [[
+        InlineKeyboardButton('🔍 Search On Google', url="https://google.com/search?q={search}")
+      ],
+      [
+        InlineKeyboardButton('✘ Close ✘', callback_data='close_data')
+     ]]))
+
+    await asyncio.sleep(50)
+    await msg.delete()
+
+
+@Client.on_message(filters.command('tam'))
+async def tam(client, message):
+    msg = await message.reply_text("""
+நீங்கள் கோரிய கோப்பை என்னால் கண்டுபிடிக்க முடியவில்லை 😕
+பின்வருவனவற்றை செய்ய முயற்சிக்கவும்...
+
+=> சரியான எழுத்துப்பிழையுடன் கோரிக்கை
+
+=> OTT இயங்குதளங்களில் வெளியிடப்படாத திரைப்படங்களைக் கேட்க வேண்டாம்
+
+=> [MovieName, Language] இந்த வடிவமைப்பில் கேட்க முயற்சிக்கவும்.
+
+=> Google இல் தேட கீழே உள்ள பொத்தானைப் பயன்படுத்தவும் 😌
+""", parse_mode="md",
+     reply_markup = InlineKeyboardMarkup(
+      [[
+        InlineKeyboardButton('🔍 Search On Google', url="https://google.com/search?q={search}")
+      ],
+      [
+        InlineKeyboardButton('✘ Close ✘', callback_data='close_data')
+     ]]))
+
+    await asyncio.sleep(50)
+    await msg.delete()
+
+
 @Client.on_message(filters.group & filters.text & filters.incoming)
 async def give_filter(client,message):
     group_id = message.chat.id
@@ -135,18 +240,37 @@ async def next_page(bot, query):
         off_set = offset - 10
     if n_offset == 0:
         btn.append(
-            [InlineKeyboardButton("⏪ BACK", callback_data=f"next_{req}_{key}_{off_set}"), InlineKeyboardButton(f"📃 Pages {round(int(offset)/10)+1} / {round(total/10)}", callback_data="pages")]
+            [InlineKeyboardButton("⏪ BACK", callback_data=f"next_{req}_{key}_{off_set}")]
+        )
+        btn.append(
+            [InlineKeyboardButton(f"🔰 Pages {round(int(offset)/10)+1} / {round(total/10)}🔰", callback_data="pages")]
         )
     elif off_set is None:
-        btn.append([InlineKeyboardButton(f"🗓 {round(int(offset)/10)+1} / {round(total/10)}", callback_data="pages"), InlineKeyboardButton("NEXT ⏩", callback_data=f"next_{req}_{key}_{n_offset}")])
+        btn.append(
+            [InlineKeyboardButton(text="NEXT ⏩",callback_data=f"next_{req}_{key}_{offset}")]
+        )
+        btn.append(
+            [InlineKeyboardButton(text=f"🔰 Pages 1/{round(int(total_results)/10)}🔰",callback_data="pages")]
+        )
     else:
         btn.append(
             [
                 InlineKeyboardButton("⏪ BACK", callback_data=f"next_{req}_{key}_{off_set}"),
-                InlineKeyboardButton(f"🗓 {round(int(offset)/10)+1} / {round(total/10)}", callback_data="pages"),
                 InlineKeyboardButton("NEXT ⏩", callback_data=f"next_{req}_{key}_{n_offset}")
-            ],
+            ], 
         )
+        btn.append(
+            [InlineKeyboardButton(f"🔰 Pages {round(int(offset)/10)+1} / {round(total/10)}🔰", callback_data="pages")]
+        )
+    btn.insert(0, 
+            [
+                InlineKeyboardButton(text=f"📂 File: {len(files)}", callback_data="fil"),
+                InlineKeyboardButton("🔆 Tips", callback_data="tip")
+            ])
+
+    btn.insert(0, [
+        InlineKeyboardButton(text=f"🔮 {search} 🔮", callback_data="so")
+    ])
     try:
         await query.edit_message_reply_markup( 
             reply_markup=InlineKeyboardMarkup(btn)
@@ -629,19 +753,30 @@ async def auto_filter(client, message):
                 for file in files
             ]
         else:
-            btn = [
+            m = await message.reply(
+              text=f"""
+<b>{greeting} {message.from_user.mention}✨
+I couldn't find anything related to your request. 🤧
+Try reading the instructions below 👇</b>""",
+          reply_markup=InlineKeyboardMarkup(
                 [
-                    InlineKeyboardButton(
-                        text=f"{file.file_name}",
-                        callback_data=f'files#{file.file_id}',
-                    ),
-                    InlineKeyboardButton(
-                        text=f"{get_size(file.file_size)}",
-                        callback_data=f'files_#{file.file_id}',
-                    ),
+                    [
+                        InlineKeyboardButton("📑 Instructions 📑", callback_data='ins')
+                    ],
+                    [       
+                        InlineKeyboardButton("Mal", callback_data="mal"),
+                        InlineKeyboardButton("Tam", callback_data="tam"),
+                        InlineKeyboardButton("Hin", callback_data="hin"),
+                        InlineKeyboardButton("Eng", callback_data="english") 
+                    ]
                 ]
-                for file in files
-            ]
+            )
+         )          
+            await asyncio.sleep(20)
+            await m.delete()
+        if not btn:
+            return
+
 
         if offset != "":
             key = f"{message.chat.id}-{message.message_id}"
@@ -667,16 +802,39 @@ async def auto_filter(client, message):
         imdb = await get_poster(search) if IMDB else None
         if imdb and imdb.get('poster'):
             try:
-                await message.reply_photo(photo=imdb.get('poster'), caption=f"<b>Query: {search}</b> \n‌‌‌‌IMDb Data:\n\n🏷 Title: <a href={imdb['url']}>{imdb.get('title')}</a>\n🎭 Genres: {imdb.get('genres')}\n📆 Year: <a href={imdb['url']}/releaseinfo>{imdb.get('year')}</a>\n🌟 Rating: <a href={imdb['url']}/ratings>{imdb.get('rating')}</a> / 10", reply_markup=InlineKeyboardMarkup(btn))
+                await message.reply_photo(photo=imdb.get('poster'), caption=f"""<b>{imdb.get('title')}</b>
+
+
+<b>🧬 Genre:</b> {imdb.get('genres')}
+<b>🌟 Rating:</b> {imdb.get('rating')}
+<b>⏱️ Duration:</b> {imdb.get('runtime')}
+<b>📆 Release:</b> {imdb.get('year')}
+<b>🎙 Language:</b> {imdb.get('languages')}
+
+<b>💭 Requested By:</b> <tg-spoiler>||{message.from_user.mention}||</tg-spoiler>
+
+<b>🔰 Powered By:</b> <b>{message.chat.title}</b>""", reply_markup=InlineKeyboardMarkup(btn))
             except (MediaEmpty, PhotoInvalidDimensions, WebpageMediaEmpty):
                 pic = imdb.get('poster')
                 poster = pic.replace('.jpg', "._V1_UX360.jpg")
-                await message.reply_photo(photo=poster, caption=f"<b>Query: {search}</b> \n‌‌‌‌IMDb Data:\n\n🏷 Title: <a href={imdb['url']}>{imdb.get('title')}</a>\n🎭 Genres: {imdb.get('genres')}\n📆 Year: <a href={imdb['url']}/releaseinfo>{imdb.get('year')}</a>\n🌟 Rating: <a href={imdb['url']}/ratings>{imdb.get('rating')}</a> / 10", reply_markup=InlineKeyboardMarkup(btn))
+                await message.reply_photo(photo=poster, caption=f"""<b>{imdb.get('title')}</b>
+
+
+<b>🧬 Genre:</b> {imdb.get('genres')}
+<b>🌟 Rating:</b> {imdb.get('rating')}
+<b>⏱️ Duration:</b> {imdb.get('runtime')}
+<b>📆 Release:</b> {imdb.get('year')}
+<b>🎙 Language:</b> {imdb.get('languages')}
+
+<b>💭 Requested By:</b> <tg-spoiler>||{message.from_user.mention}||</tg-spoiler>
+
+<b>🔰 Powered By:</b> <b>{message.chat.title}</b>""", reply_markup=InlineKeyboardMarkup(btn))
             except Exception as e:
                 print(e)
-                await message.reply_text(f"<b>Query: {search}</b> \n‌‌‌‌IMDb Data:\n\n🏷 Title: <a href={imdb['url']}>{imdb.get('title')}</a>\n🎭 Genres: {imdb.get('genres')}\n📆 Year: <a href={imdb['url']}/releaseinfo>{imdb.get('year')}</a>\n🌟 Rating: <a href={imdb['url']}/ratings>{imdb.get('rating')}</a> / 10", reply_markup=InlineKeyboardMarkup(btn))
+                await message.reply_sticker(sticker="CAACAgUAAxkBAAIGzGJi4LmteW8DPnYEHWLqC6AB7RhuAAKnAAPIlGQUYKZ2tWflHJ0eBA", reply_markup=InlineKeyboardMarkup(btn))
         elif imdb:
-            await message.reply_text(f"<b>Query: {search}</b> \n‌‌‌‌IMDb Data:\n\n🏷 Title: <a href={imdb['url']}>{imdb.get('title')}</a>\n🎭 Genres: {imdb.get('genres')}\n📆 Year: <a href={imdb['url']}/releaseinfo>{imdb.get('year')}</a>\n🌟 Rating: <a href={imdb['url']}/ratings>{imdb.get('rating')}</a> / 10", reply_markup=InlineKeyboardMarkup(btn))
+            await message.reply_sticker(sticker="CAACAgUAAxkBAAIGzGJi4LmteW8DPnYEHWLqC6AB7RhuAAKnAAPIlGQUYKZ2tWflHJ0eBA", reply_markup=InlineKeyboardMarkup(btn))
         else:
-            await message.reply_text(f"<b>Here is What I Found In My Database For Your Query {search} ‌‌‌‌‎ </b>", reply_markup=InlineKeyboardMarkup(btn))
+            await message.reply_sticker(sticker="CAACAgUAAxkBAAIGzGJi4LmteW8DPnYEHWLqC6AB7RhuAAKnAAPIlGQUYKZ2tWflHJ0eBA", reply_markup=InlineKeyboardMarkup(btn))
+
         
